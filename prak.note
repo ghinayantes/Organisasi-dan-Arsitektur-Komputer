@@ -1,0 +1,103 @@
+int informatika(int x) {
+    return (x << 7) + (x << 2) + (x << 1) + x;
+}
+```
+
+---
+
+## Clue soal-soal berikutnya
+
+---
+
+### No. 4 — collatz_conjecture
+```
+Jika N genap → N/2
+Jika N ganjil → 3N+1
+```
+**Clue:** Ini soal *branchless* — tidak boleh pakai `if`. Triknya:
+- Cek genap/ganjil dengan `N & 1` (LSB)
+- Buat **mask** dari bit tersebut: kalau ganjil mask = `0xFFFFFFFF`, kalau genap mask = `0x00000000`
+- Gunakan mask untuk memilih antara dua hasil tanpa `if`:
+```
+  result = (hasil_genap & ~mask) | (hasil_ganjil & mask)
+```
+- `N >> 1` untuk bagi 2, `(N << 1) + N + 1` untuk 3N+1
+
+---
+
+### No. 5 — confusion
+```
+Kembalikan (3A - 4B) mod (2^C)
+```
+**Clue:**
+- `3A = (A << 1) + A`, `4B = B << 2`
+- Untuk `mod 2^C`: ingat bahwa `x mod 2^n = x & (2^n - 1)`
+- Buat mask `2^C - 1` tanpa pakai konstanta besar — gunakan shift: `(1 << C) + ~0` (karena `~0 = -1`, jadi `(1<<C) - 1`)
+
+---
+
+### No. 6 — absolute_cinema
+```
+Kembalikan |x|
+```
+**Clue:**
+- Sign bit ada di posisi 31: `sign = x >> 31` → hasilnya `0x00000000` (positif) atau `0xFFFFFFFF` (negatif)
+- Trik nilai mutlak tanpa `if`:
+  - Kalau positif: `x ^ 0 = x`
+  - Kalau negatif: `x ^ 0xFFFFFFFF` lalu `+1` = `-x` (two's complement negation)
+  - Gabungkan: `(x ^ sign) + (sign & 1)` atau lebih ringkas `(x ^ sign) - sign`
+  - Ingat `- sign` = `+ ~sign + 1`, tapi `-` tidak legal — pakai `+ (~sign + 1)` ... atau cari cara lain dengan `+` dan `~`
+
+---
+
+### No. 7 — isInf13 (Float 13-bit custom)
+```
+Format: 1 sign | 4 exp | 8 mantissa
++inf / -inf: exp semua 1, mantissa semua 0
+```
+**Clue:**
+- Isolasi exp bits: `(f >> 8) & 0xF` → harus `= 0xF` (semua 1)
+- Isolasi mantissa bits: `f & 0xFF` → harus `= 0`
+- Kombinasikan dua kondisi tersebut → ingat `!x` mengubah nonzero jadi 0, zero jadi 1
+
+---
+
+### No. 8 — baNaNa (Float 32-bit)
+```
+NaN: exp semua 1, mantissa TIDAK semua 0
+```
+**Clue:**
+- Isolasi exp (8 bit): `(f >> 23) & 0xFF` → harus `= 0xFF`
+- Isolasi mantissa (23 bit): `f & 0x7FFFFF` → harus `!= 0`
+- Gabungkan dua kondisi — gunakan `!` dan `!!` untuk konversi ke boolean (0 atau 1)
+
+---
+
+### No. 9 — floomf (Float custom, return -|f|)
+```
+Format: 1 sign | B exp | (B*3) mantissa
+Kembalikan -|f|
+```
+**Clue:**
+- `-|f|` artinya: apapun nilai f, **paksa sign bit jadi 1**
+- Sign bit ada di posisi `1 + B + (B*3) - 1 = 4B` dari LSB
+- Buat mask untuk sign bit: `1 << (4*B)`... tapi `*` tidak legal! Gunakan shift: `B << 2` = `B*4`, jadi `1 << (B << 2)`
+- OR-kan f dengan mask tersebut
+
+---
+
+### No. 10 & 11 — six_seven dan SIX_SEVEEEEEEEN
+```
+x <= y → return 67, else return 76
+```
+**Clue:**
+- `67 = 76 - 9`, jadi bisa pakai `76 + (mask & (-9))` atau `76 + (mask & 9~...)`
+- Lebih mudah: `67 ^ ((67^76) & mask)` — kalau mask = 0 → 67, mask = 0xFF..FF → 76... atau sebaliknya
+- Untuk `six_seven` (range kecil): `x - y` tidak overflow, cek sign bit hasilnya
+- Untuk `SIX_SEVEEEEEEEN` (full int range): **awas overflow!** `x - y` bisa overflow kalau beda tanda. Tangani dengan cek sign `x` dan `y` terlebih dulu — kalau beda tanda, sign `x` langsung jadi jawabannya; kalau sama tanda, `x - y` aman
+
+---
+
+### No. 12 — unwavering_feelings (BONUS)
+```
+Kembalikan (x * 5) / 128, pembulatan ke 0

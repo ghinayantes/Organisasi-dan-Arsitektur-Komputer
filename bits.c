@@ -177,7 +177,7 @@ int collatz_conjecture(int N) {
  * 
  */
 int confusion(int A, int B, int C) {
-    return 2;
+    return (((A << 1) + A) + (~(B << 2) +1)) & ((1 << C) + ~0);
 }
 /**
  * [WAJIB] [INTEGER]
@@ -192,7 +192,9 @@ int confusion(int A, int B, int C) {
  * 
  */
 int absolute_cinema(int x) {
-    return 2;
+    int mask;
+    mask = x >> 31;
+    return (x ^ mask) + (mask & 1);
 }
 /**
  * [WAJIB] [FLOAT]
@@ -218,7 +220,10 @@ int absolute_cinema(int x) {
  * 
  */
 int isInf13(unsigned f) {
-    return 2;
+    int e, m;
+    e = (f >> 8) & 0xF;
+    m = f & 0xFF;
+    return !(e ^ 0xF) & !m;
 }
 /**
  * [WAJIB] [FLOAT]
@@ -241,7 +246,10 @@ int isInf13(unsigned f) {
  * 
  */
 int baNaNa(unsigned f) {
-    return 2;
+    int e, m;
+    e = (f >> 23) & 0xFF;
+    m = f << 9;          
+    return !(e ^ 0xFF) & !!m;
 }
 /**
  * [WAJIB] [FLOAT]
@@ -271,7 +279,7 @@ int baNaNa(unsigned f) {
  * 
  */
 unsigned floomf(unsigned f, int B) {
-    return 2;
+    return f | (1 << (B << 2));
 }
 /** 
  * six_seven - Jika x <= y maka kembalikan 67. Sebaliknya kembalikan 76.
@@ -290,7 +298,10 @@ unsigned floomf(unsigned f, int B) {
  * 
  */
 int six_seven(int x, int y) {
-    return 2;
+    int diff, mask;
+    diff = x + ~y;
+    mask = diff >> 31;
+    return 76 + (mask & (67 + ~76 + 1));
 }
 /** 
  * SIX_SEVEEEEEEEN - Jika x <= y maka kembalikan 67. Sebaliknya kembalikan 76.
@@ -309,7 +320,14 @@ int six_seven(int x, int y) {
  * 
  */
 int SIX_SEVEEEEEEEN(int x, int y) {
-    return 2;
+    int sx, sy, diff, same_sign, mask_diff, mask;
+    sx = x >> 31;
+    sy = y >> 31;
+    diff = x + (~y);
+    mask_diff = diff >> 31;
+    same_sign = ~(sx ^ sy);
+    mask = (same_sign & mask_diff) | (~same_sign & sx);
+    return 76 + (mask & (~9 + 1));
 }
 /**
  * [BONUS] [INTEGER]
@@ -333,5 +351,12 @@ int SIX_SEVEEEEEEEN(int x, int y) {
  * 
  */
 int unwavering_feelings(int x) {
-    return 2;
+    int sign, q, r, q5, r5;
+    sign = x >> 31;                  
+    q = (x + (sign & 127)) >> 7;     
+    r = x + ~(q << 7) + 1;           
+    q5 = (q << 2) + q;               
+    r5 = (r << 2) + r;               
+    r5 = (r5 + (sign & 127)) >> 7;   
+    return q5 + r5;         
 }
